@@ -1,0 +1,238 @@
+<html>
+<script language=javascript>
+
+var mark;
+var bullet;
+var timeLimit;
+var startSecond;
+var tick;
+var gameStat;
+var scoreInt;
+var shootStat;
+
+timeLimit = 30;
+scoreInt = 10;
+
+function startGame()
+{	
+	if (gameStat == "new" || gameStat == "") {
+		stopGame();
+		gameForm.gameScore.value = 0;
+		gameForm.gameTime.value = timeLimit;
+	}
+	now = new Date();
+	startSecond = now.getSeconds();
+
+	if (gameStat != "pause") {
+		tick = 0;
+	}
+
+	if (parseInt(gameForm.gameSpeed.value) >= 10) {
+		gameForm.gameSpeed.value=10;
+	}
+	speed = (10 - parseInt(gameForm.gameSpeed.value) + 1) * 3;
+
+	mark=window.setInterval("beginMove()",parseInt(speed));
+	gameStat = "new";
+	gameForm.gameSpeed.disabled = true;
+	gameForm.startBt.disabled = true;
+	gameForm.pauseBt.disabled = false;
+	gameForm.stopBt.disabled = false;
+}
+
+function beginMove()
+{
+	now = new Date();
+	thisSecond = parseInt(now.getSeconds());
+	if (thisSecond == 0) {
+		thisSecond = 60;
+	}
+	if (thisSecond - startSecond == 1) {
+		startSecond = thisSecond;
+		if (startSecond == 60) {
+			startSecond = 0;
+		}
+		tick++;	
+	}
+	gameForm.gameTime.value = timeLimit - tick;
+	if (tick >= timeLimit) {
+		alert("TIME OUT !!! Your score is " + parseInt(gameForm.gameScore.value));
+		gameForm.gameScore.value = 0;
+		stopGame();
+	}
+	else {
+		document.all.burung.style.pixelLeft = document.all.burung.style.pixelLeft + 5;
+
+		if(document.all.burung.style.pixelLeft >= document.body.offsetWidth - 110)
+		{
+			document.all.burung.style.pixelLeft = 0;
+		}
+	}
+}
+
+function beginShoot()
+{
+	
+	document.all.pelor.style.pixelTop = document.all.pelor.style.pixelTop - 10;
+	document.all.pelor2.style.pixelTop = document.all.pelor2.style.pixelTop - 10;
+	
+	if (Math.abs(document.all.burung.style.pixelLeft - document.all.pelor.style.pixelLeft) >= 15 && Math.abs(document.all.burung.style.pixelLeft - document.all.pelor.style.pixelLeft) <= 40 && Math.abs(document.all.burung.style.pixelTop - document.all.pelor.style.pixelTop) <= 75) {
+		gameForm.gameScore.value = parseInt(gameForm.gameScore.value) + scoreInt;
+		gameForm.gameTime.value = parseInt(gameForm.gameTime.value) + 5;
+		tick -= 5;
+		document.all.pelor.style.pixelTop = 400;
+		document.all.pelor2.style.pixelTop = 400;
+		window.clearInterval(bullet);
+	}
+
+	if (Math.abs(document.all.burung.style.pixelLeft - document.all.pelor2.style.pixelLeft) >= 15 && Math.abs(document.all.burung.style.pixelLeft - document.all.pelor2.style.pixelLeft) <= 40 && Math.abs(document.all.burung.style.pixelTop - document.all.pelor2.style.pixelTop) <= 75) {
+		gameForm.gameScore.value = parseInt(gameForm.gameScore.value) + scoreInt;
+		gameForm.gameTime.value = parseInt(gameForm.gameTime.value) + 5;
+		tick -= 5;
+		document.all.pelor.style.pixelTop = 400;
+		document.all.pelor2.style.pixelTop = 400;
+		window.clearInterval(bullet);
+	}
+
+	if(document.all.pelor.style.pixelTop <= 200)
+	{
+		document.all.pelor.style.pixelTop = 400;
+		document.all.pelor2.style.pixelTop = 400;
+		window.clearInterval(bullet);
+	}
+}
+
+function stopGame() {
+	gameForm.gameScore.value = 0;
+
+	setPosition();
+	tick = 0;
+	startSecond = 0;
+	gameStat = "";
+	window.clearInterval(mark);
+	window.clearInterval(bullet);
+	gameForm.gameTime.value = timeLimit;
+	gameForm.startBt.disabled = false;
+	gameForm.pauseBt.disabled = true;
+	gameForm.stopBt.disabled = true;
+	gameForm.gameSpeed.disabled = false;}
+
+function pauseGame() {
+	gameStat = "pause";
+	window.clearInterval(mark);
+	gameForm.startBt.disabled = false;
+	gameForm.pauseBt.disabled = true;
+	gameForm.stopBt.disabled = false;
+}
+
+function moveChar() {
+	if (gameStat == "new") {
+		if (window.event.y > 150 && window.event.y < 400 && window.event.x < document.body.offsetWidth - 110) {
+			document.all.pestol.style.pixelLeft = window.event.x;
+			document.all.pelor.style.pixelLeft = window.event.x + 15;
+			document.all.pelor2.style.pixelLeft = window.event.x + 75;
+		}
+	}
+}
+
+function shoot() {
+	if (shootStat == "shooted") {
+		window.clearInterval(bullet);
+	}
+	if (gameStat == "new") {
+		if (window.event.y > 150 && window.event.y < 400) {
+			bullet=window.setInterval("beginShoot()",2);
+			shootStat = "shooted";
+		}
+	}
+}
+
+function setTime() {
+	gameForm.gameTime.value=timeLimit;
+}
+
+function setPosition() {
+	document.all.burung.style.pixelLeft = document.body.offsetWidth / 2 - 35;
+	document.all.pestol.style.pixelLeft = document.body.offsetWidth / 2 - 45;
+	document.all.pelor.style.pixelLeft = document.all.pestol.style.pixelLeft + 15;
+	document.all.pelor2.style.pixelLeft = document.all.pestol.style.pixelLeft + 75;
+	document.all.pelor.style.pixelTop = 400;
+	document.all.pelor2.style.pixelTop = 400;
+	document.all.pestol.style.pixelTop = 400;
+	document.all.burung.style.pixelTop = 150;
+}
+</script>
+
+<style>
+
+.tbutton {
+	PADDING-RIGHT: 1px;
+	PADDING-LEFT: 1px;
+	FONT-SIZE: 11px;
+	PADDING-BOTTOM: 1px;
+	VERTICAL-ALIGN: middle;
+	COLOR: #FFFFFF;
+	PADDING-TOP: 1px;
+	FONT-FAMILY: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	background-color: #919191;
+	border: 1px solid #919191;
+}
+.textbox {
+	PADDING-RIGHT: 2px;
+	PADDING-LEFT: 2px;
+	FONT-WEIGHT: lighter;
+	FONT-SIZE: 11px;
+	PADDING-BOTTOM: 0px;
+	VERTICAL-ALIGN: middle;
+	COLOR: #000000;
+	PADDING-TOP: 0px;
+	FONT-FAMILY: Tahoma, Verdana, Arial, Helvetica, sans-serif;
+	HEIGHT: 18px;
+	BACKGROUND-COLOR:#ffffff;
+	border: 1px solid #999999;
+}
+</style>
+
+<body onload="setTime();setPosition();" onmousemove="moveChar();" onclick="shoot()">
+<form name="gameForm">
+<table border="0" cellpadding="2" cellspacing="2" ALIGN="CENTER">
+<tr>
+	<td>
+		<font face="verdana" style="font-size:11px;">Game Speed </font>
+	</td>
+	<td>
+		<input type="text" name="gameSpeed" size="5" value="5" class="textbox">&nbsp;&nbsp;<font face="verdana" style="font-size:9px;"><i><b>(Max = 10)</b></i></font>
+	</td>
+</tr>
+<tr>
+	<td>
+		<font face="verdana" style="font-size:11px;">Time Left </font>
+	</td>
+	<td>
+		<input type="text" name="gameTime" size="5" class="textbox" disabled>&nbsp;&nbsp;<font face="verdana" style="font-size:9px;"><i><b>Second(s)</b></i></font>
+	</td>
+</tr>
+<tr>
+	<td>
+		<font face="verdana" style="font-size:11px;">Score</font>
+	</td>
+	<td>
+		<input type="text" name="gameScore" size="5" value="0" disabled class="textbox">&nbsp;&nbsp;<font face="verdana" style="font-size:9px;"><i><b>(1 hit = 10 point & 5 seconds bonus) ;)</b></i></font>
+	</td>
+</tr>
+<tr>
+	<td>&nbsp;
+	</td>
+	<td>
+		<input type=button value=Start name=startBt onclick="startGame();moveChar();" class="tbutton">
+		<input type=button value=Pause name=pauseBt onclick="pauseGame()" disabled class="tbutton">
+		<input type=button value=Stop name=stopBt onclick="stopGame()" disabled class="tbutton">
+	</td>
+</tr>
+ </table>
+<img src="./images/burung.jpg" id="burung" style="position:absolute;top:150;left:0"> 
+<img src="./images/pelor.jpg" id="pelor" style="position:absolute;top:450;left:15;">
+<img src="./images/pelor.jpg" id="pelor2" style="position:absolute;top:450;left:75;">
+<img src="./images/pestol.jpg" id="pestol" style="position:absolute;top:400;left:0"> 
+</form>
+</body></html>
